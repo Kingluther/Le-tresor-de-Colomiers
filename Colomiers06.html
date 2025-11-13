@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le trésor de Colomiers - Étape 6</title>
+    <style>
+        /* --- DESIGN GÉNÉRAL (IDENTIQUE) --- */
+        body {
+            font-family: 'Verdana', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d35400;
+            font-size: 24px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #2980b9;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 5px solid #2980b9;
+            padding-left: 10px;
+        }
+
+        /* --- STYLE DES DIALOGUES --- */
+        .dialogue-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .bubble {
+            background-color: #e9eff5;
+            padding: 12px 15px;
+            border-radius: 0 15px 15px 15px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .bubble::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid #e9eff5;
+            border-left: 10px solid transparent;
+        }
+
+        .name-tag {
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 4px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        /* Petite classe pour les descriptions narratives (actions, sons) */
+        .narrative-note {
+            text-align: center;
+            font-style: italic;
+            color: #888;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+
+        /* --- COORDONNÉES GPS --- */
+        .gps-box {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+        }
+        .gps-link {
+            display: inline-block;
+            margin-top: 5px;
+            color: #856404;
+            font-weight: bold;
+            text-decoration: none;
+            border-bottom: 2px dotted #856404;
+        }
+        .gps-link:hover {
+            background-color: #856404;
+            color: white;
+        }
+
+        /* --- ENCART "MISSION" (ORANGE) --- */
+        .mission-box {
+            border: 3px dashed #d35400;
+            background-color: #fffdf0;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 10px;
+            color: #d35400;
+        }
+
+        /* --- ENCART "DIRECTION" (GRIS/NEUTRE) --- */
+        .direction-box {
+            background-color: #f8f9fa;
+            border-left: 6px solid #95a5a6;
+            padding: 15px 20px;
+            margin-top: 40px;
+            color: #555;
+            font-style: italic;
+            font-size: 15px;
+        }
+
+        /* --- IMAGE D'ILLUSTRATION (Spécifique) --- */
+        .illustration-grande {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Le trésor de Colomiers</h1>
+
+    <h2>6. Place Joseph Verseille</h2>
+
+    <div class="gps-box">
+        📍 Cliquez pour y aller :<br>
+        <a href="http://googleusercontent.com/maps.google.com/6" target="_blank" class="gps-link">
+            43.609642, 1.339603
+        </a>
+    </div>
+
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Joseph Verseille… j’ai déjà lu ce nom quelque part… Mais où ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            J’aurais bien une réponse à te faire, mais ça va pas te plaire…
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Bon, les gars, on peut redevenir un peu sérieux. Regardez cette photo : nous sommes sur l’ancienne place du village. Il est dit que c’est là que les columérins se rassemblaient pour les grandes fêtes. Des tables étaient dressées et on y partageait des repas avec tous les habitants.
+        </div>
+    </div>
+    
+    <img src="Verseille.jpg" alt="Ancienne place du village Place Joseph Verseille" class="illustration-grande">
+
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Ca va bien quand t’es quelques centaines, mais tu rentreras pas 40.000 personnes sur cette petite place !
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Moi je crois que c’est ça le trésor de Colomiers. La dolce vita. Simplement le bonheur de vivre en paix.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Euh, les gars, ça y est, je me suis souvenu d’où je connais le nom de Joseph Verseille. Il était sur le monument aux morts, dans les F. F. I. J’ai trouvé un article qui raconte la libération de Colomiers. Le 19 août 1944, 300 soldats allemands quittent la ville en faisant sauter les avions en réparation, les dépôts de bombes, incendient des gerbiers et brûlent des caisses d’archives à la Mairie. C’est dans ce chaos qu’arrivera le décès accidentel de Joseph Verseille sur les marches de la Mairie.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Ouaip. Tu repasseras quand même pour la Dolce Vita.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Gloups. Bon, ben faut chercher un autre trésor. Peut-être à la nouvelle mairie ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            De toute façon, tant qu’on n’a pas de nouvelles de Didier, on peut continuer la balade…
+        </div>
+    </div>
+
+
+    <div class="mission-box">
+        Le bâtiment de l’ancien Hotel de Ville a été conservé et restauré. Il est devenu un lieu municipal qui accompagne les porteurs de projets dans la création professionnelle. Combien de lettres composent ce nom féminin commençant par la lettre M (sans compter le déterminant) ?
+        <br><br>
+        Notez ce chiffre qui vaut F : F =_____
+    </div>
+
+    <div class="direction-box">
+        En poursuivant de nouveau sur la rue Gilet vous arriverez au bout de la rue à votre prochaine étape.
+    </div>
+
+    </div>
+
+</body>
+</html>
