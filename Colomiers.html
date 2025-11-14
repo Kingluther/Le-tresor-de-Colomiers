@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Le trésor de Colomiers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le trésor de Colomiers - Étape 1</title>
     <style>
-        /* --- DESIGN GÉNÉRAL --- */
+        /* --- DESIGN GÉNÉRAL (IDENTIQUE) --- */
         body {
             font-family: 'Verdana', sans-serif;
             background-color: #f0f2f5;
@@ -20,7 +21,7 @@
             min-height: 100vh;
             padding: 20px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            padding-bottom: 40px; /* Marge en bas de page */
+            padding-bottom: 40px;
         }
 
         h1 {
@@ -41,7 +42,7 @@
             padding-left: 10px;
         }
 
-        /* --- STYLE DES DIALOGUES --- */
+        /* --- STYLE DES DIALOGUES (IDENTIQUE) --- */
         .dialogue-row {
             display: flex;
             align-items: flex-start;
@@ -112,20 +113,85 @@
         /* --- ENCART "MISSION" (ORANGE) --- */
         .mission-box {
             border: 3px dashed #d35400;
-            background-color: #fffdf0;
+            background-color: #fffaf0;
             padding: 20px;
             margin: 30px 0;
+            text-align: left; 
+            font-size: 15px;
+            border-radius: 10px;
+            color: #333;
+        }
+        
+        /* Zone de saisie du résultat (A) */
+        .answer-input-zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .answer-input-zone label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .answer-input-zone input {
+            width: 50px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        /* Bouton de validation */
+        #validate-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 5px;
             font-weight: bold;
             font-size: 16px;
-            border-radius: 10px;
-            color: #d35400;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        /* Styles du bouton */
+        .btn-default {
+            background-color: #bdc3c7; /* Gris neutre */
+            color: #34495e;
+        }
+
+        .btn-validated {
+            background-color: #e67e22; /* Orange: Validé/Sauvegardé */
+            color: white;
+        }
+
+        .btn-default:hover {
+            background-color: #ccd1d1;
+        }
+
+        /* Message de validation des contraintes */
+        #validation-message {
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #e74c3c;
+            min-height: 20px;
+            text-align: center;
         }
 
         /* --- ENCART "DIRECTION" (GRIS/NEUTRE) --- */
         .direction-box {
             background-color: #f8f9fa;
-            border-left: 6px solid #95a5a6; /* Barre grise à gauche */
+            border-left: 6px solid #95a5a6;
             padding: 15px 20px;
             margin-top: 40px;
             color: #555;
@@ -135,7 +201,7 @@
 
     </style>
 </head>
-<body>
+<body onload="initEnigmaPage('A')">
 
 <div class="container">
 
@@ -179,7 +245,7 @@
     <div class="gps-box">
         📍 Cliquez pour y aller :<br>
         <a href="https://www.google.com/maps/search/?api=1&query=43.61484982050273,1.3375967858732163" target="_blank" class="gps-link">
-            43.61484982050273, 1.3375967858732163
+            43.61448617264853, 1.3377057629227862
         </a>
     </div>
 
@@ -220,7 +286,7 @@
         <img src="Bernard.jpg" alt="Bernard" class="avatar">
         <div class="bubble">
             <span class="name-tag">Bernard</span>
-           Il devrait pas tarder. On a qu’à commencer sans lui !
+            Il devrait pas tarder. On a qu’à commencer sans lui !
         </div>
     </div>
 
@@ -242,7 +308,18 @@
 
 
     <div class="mission-box">
-        ***Sur le panneau, repérez à quelle date bla bla bla. Ajoutez les chiffres pour former un nombre. Notez ce nombre qui vaut A : A =_____***
+        Sur le panneau à droite de la porte vous trouverez la réponse à cette question : combien le château comptait-il de tours à encorbellement avant sa destruction ? Notez ce chiffre qui vaut A. 
+        
+        <div class="answer-input-zone">
+            <label for="A">A =</label>
+            <input type="number" id="A" min="0" max="99" required oninput="resetValidation('A')">
+        </div>
+        
+        <div id="validation-message"></div>
+        
+        <button id="validate-button" class="btn-default" onclick="handleValidation('A')">
+            Valider la réponse
+        </button>
     </div>
 
 
@@ -275,6 +352,143 @@
     </div>
 
 </div>
+
+<script>
+    // ----------------------------------------------------------------------
+    // --- GESTION ET PERSISTANCE DES DONNÉES (À INCLURE DANS CHAQUE PAGE) ---
+    // ----------------------------------------------------------------------
+
+    const ENIGMA_STORAGE_KEY = 'colomiers_enigma_answers';
+    const DEFAULT_ANSWERS = {A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null, J: null, K: null, L: null, M: null, N: null};
+
+    function loadEnigmaAnswers() {
+        try {
+            const savedData = localStorage.getItem(ENIGMA_STORAGE_KEY);
+            return savedData ? {...DEFAULT_ANSWERS, ...JSON.parse(savedData)} : DEFAULT_ANSWERS;
+        } catch (e) {
+            console.error("Impossible de charger les réponses.", e);
+            return DEFAULT_ANSWERS;
+        }
+    }
+
+    function saveEnigmaAnswers(vars) {
+        try {
+            localStorage.setItem(ENIGMA_STORAGE_KEY, JSON.stringify(vars));
+        } catch (e) {
+            console.error("Impossible de sauvegarder les réponses. Le stockage local est bloqué.", e);
+        }
+    }
+    
+    /**
+     * Réinitialise le style du bouton de validation lorsque le champ est modifié.
+     * @param {string} varKey - La lettre de la variable (ex: 'A').
+     */
+    function resetValidation(varKey) {
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const validationMessage = document.getElementById('validation-message');
+        
+        // 1. Réinitialiser le style du bouton
+        button.classList.remove('btn-validated');
+        button.classList.add('btn-default');
+        button.textContent = "Valider la réponse";
+
+        // 2. Supprimer les messages d'erreur au fur et à mesure de la saisie
+        validationMessage.textContent = "";
+
+        // 3. Vider la valeur sauvegardée si l'utilisateur vide l'input
+        const rawValue = inputElement.value.trim();
+        if (rawValue === "") {
+            let currentVars = loadEnigmaAnswers();
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+        }
+    }
+
+
+    /**
+     * Gère la validation de l'utilisateur au clic sur le bouton.
+     * @param {string} varKey - La lettre de la variable (ex: 'A').
+     */
+    function handleValidation(varKey) {
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const validationMessage = document.getElementById('validation-message');
+        
+        const rawValue = inputElement.value.trim();
+        const value = parseInt(rawValue);
+        let currentVars = loadEnigmaAnswers();
+        
+        validationMessage.textContent = "";
+
+        // CAS 1: Champ vide
+        if (rawValue === "") {
+            validationMessage.textContent = "❌ Veuillez entrer une valeur numérique.";
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+            resetButtonToDefault(button);
+            return;
+        }
+        
+        // CAS 2: Validation Générale (Entier naturel positif entre 0 et 99)
+        if (isNaN(value) || value < 0 || value > 99 || rawValue.includes('.')) {
+            validationMessage.textContent = "❌ Valeur incorrecte. Veuillez entrer un nombre entier positif entre 0 et 99.";
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+            resetButtonToDefault(button);
+            return;
+        }
+
+        // CAS 3: Succès - La valeur est valide
+        currentVars[varKey] = value;
+        saveEnigmaAnswers(currentVars);
+        
+        // Mise à jour du bouton pour indiquer la sauvegarde
+        button.classList.remove('btn-default');
+        button.classList.add('btn-validated');
+        button.textContent = `Réponse ${varKey} = ${value} Sauvegardée !`;
+    }
+
+    /**
+     * Réinitialise le bouton à son état par défaut (Gris).
+     */
+    function resetButtonToDefault(button) {
+        button.classList.remove('btn-validated');
+        button.classList.add('btn-default');
+        button.textContent = "Valider la réponse";
+    }
+    
+    /**
+     * Fonction d'initialisation : charge les données au chargement de la page et met à jour le bouton.
+     * @param {string} varKey - La lettre de la variable pour cette page (ex: 'A').
+     */
+    function initEnigmaPage(varKey) {
+        const loadedVars = loadEnigmaAnswers();
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const savedValue = loadedVars[varKey];
+        
+        // Vider l'input dans tous les cas au chargement (conformément à la demande)
+        if (inputElement) {
+            inputElement.value = "";
+        }
+        
+        if (button && savedValue !== null) {
+            // Si une valeur est sauvegardée, mettre le bouton en état "Validé" (Orange)
+            button.classList.remove('btn-default');
+            button.classList.add('btn-validated');
+            button.textContent = `Réponse ${varKey} = ${savedValue} Sauvegardée !`;
+        } else if (button) {
+            // Si aucune valeur valide n'est sauvegardée, s'assurer que le bouton est gris
+            resetButtonToDefault(button);
+        }
+        
+        // S'assurer que le bouton est réinitialisé si l'utilisateur commence à saisir
+        if(inputElement) {
+            inputElement.oninput = () => resetValidation(varKey);
+        }
+    };
+</script>
 
 </body>
 </html>
