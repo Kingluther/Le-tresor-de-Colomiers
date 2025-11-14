@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le trésor de Colomiers - Étape 3</title>
+    <style>
+        /* --- DESIGN GÉNÉRAL (IDENTIQUE) --- */
+        body {
+            font-family: 'Verdana', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d35400;
+            font-size: 24px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #2980b9;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 5px solid #2980b9;
+            padding-left: 10px;
+        }
+
+        /* --- STYLE DES DIALOGUES --- */
+        .dialogue-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .bubble {
+            background-color: #e9eff5;
+            padding: 12px 15px;
+            border-radius: 0 15px 15px 15px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .bubble::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid #e9eff5;
+            border-left: 10px solid transparent;
+        }
+
+        .name-tag {
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 4px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        /* Petite classe pour les descriptions narratives (rires, etc.) */
+        .narrative-note {
+            text-align: center;
+            font-style: italic;
+            color: #888;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+
+        /* --- COORDONNÉES GPS --- */
+        .gps-box {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+        }
+        .gps-link {
+            display: inline-block;
+            margin-top: 5px;
+            color: #856404;
+            font-weight: bold;
+            text-decoration: none;
+            border-bottom: 2px dotted #856404;
+        }
+        .gps-link:hover {
+            background-color: #856404;
+            color: white;
+        }
+
+        /* --- ENCART "MISSION" (ORANGE) - ADAPTÉ POUR L'INPUT --- */
+        .mission-box {
+            border: 3px dashed #d35400;
+            background-color: #fffaf0; /* Blanc cassé pour l'encart mission */
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left; /* Aligné à gauche pour le texte long de la mission */
+            font-size: 15px;
+            border-radius: 10px;
+            color: #333;
+        }
+
+        /* Zone de saisie du résultat */
+        .answer-input-zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .answer-input-zone label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .answer-input-zone input {
+            width: 50px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        /* Bouton de validation */
+        #validate-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        /* Styles du bouton */
+        .btn-default {
+            background-color: #bdc3c7; /* Gris neutre */
+            color: #34495e;
+        }
+
+        .btn-validated {
+            background-color: #e67e22; /* Orange: Validé/Sauvegardé */
+            color: white;
+        }
+
+        .btn-default:hover {
+            background-color: #ccd1d1;
+        }
+
+        /* Message de validation des contraintes */
+        #validation-message {
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #e74c3c;
+            min-height: 20px;
+            text-align: center;
+        }
+
+        /* --- ENCART "DIRECTION" (GRIS/NEUTRE) --- */
+        .direction-box {
+            background-color: #f8f9fa;
+            border-left: 6px solid #95a5a6;
+            padding: 15px 20px;
+            margin-top: 40px;
+            color: #555;
+            font-style: italic;
+            font-size: 15px;
+        }
+
+    </style>
+</head>
+<body onload="initEnigmaPage('C')">
+
+<div class="container">
+
+    <h1>Le trésor de Colomiers</h1>
+
+    <h2>3. Les reliques de Sainte Radegonde</h2>
+
+    <div class="gps-box">
+        📍 Cliquez pour y aller :<br>
+        <a href="https://www.google.com/maps/search/?api=1&query=43.612810516824,1.3392808496255757" target="_blank" class="gps-link">
+            43.612810, 1.339280
+        </a>
+    </div>
+
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Radegonde… jamais entendu ce nom-là. Ca vient d’où d’après vous ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Poitiers ! Sainte Radegonde a été Reine des Francs au VIème siècle. Femme de Clotaire, un des fils de Clovis, elle a toujours refusé le faste de la Cour, refusant de porter de riches habits et pratiquant le jeûne à la table royale pour faire exemple d’humilité. Après que Clotaire eut assassiné son frère, elle décida de fuir ce meurtrier et se fit moniale pour qu’il n’ait plus de pouvoir sur elle. Elle fondera par la suite l’Abbaye de Poitiers.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            T’as appris tout ça avant de venir à Colomiers ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Non, mais j’ai internet sur mon téléphone.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            OK, mais alors qu’est-ce qu’elle a à voir avec Colomiers ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Ses reliques auraient été apportées à Colomiers par Alphonse de Poitiers, comte de Toulouse. Une phalange et trois os du poignet.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Ah, toi aussi t’as la 5G.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Nope, moi j’ai lu le panneau qui était sur la porte…
+        </div>
+    </div>
+
+
+    <div class="mission-box">
+        Sur le panneau qui se trouve à droite de la porte de l’église, il est écrit que « _83 citoyens actifs de la commune ont été convoqués le 7 février 1790 ». Relevez le chiffre des centaines qui vaut C.
+        
+        <div class="answer-input-zone">
+            <label for="C">C =</label>
+            <input type="number" id="C" min="0" max="99" required oninput="resetValidation('C')">
+        </div>
+        
+        <div id="validation-message"></div>
+        
+        <button id="validate-button" class="btn-default" onclick="handleValidation('C')">
+            Valider la réponse
+        </button>
+    </div>
+
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Bon, ok. Les gens venaient sûrement à Colomiers pour les reliques, mais ça peut pas être ça le « trésor » qui va nous rendre riches. Il a rien dit d’autre sur le trésor Didier ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Ben il a dit que c’était il y a très longtemps, et il avait l’air de dire que c’était un truc assez commun. Pas une phalange ou trois os du poignet d’une Sainte, ça c’est sûr.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Et alors on fait quoi, là ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            On fait koala ? Ben t’es la mieux placée pour nous le dire.
+        </div>
+    </div>
+
+    <div class="narrative-note">
+        [Serge et Bernard rient comme des idiots]
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Vous êtes bêtes ! Réfléchissons, y avait quoi y a… je sais pas moi… cent ans ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            <i>(grave)</i> La guerre.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            mmm… la guerre. Ca peut pas être ça le trésor. Mais on est à côté du Monument aux Morts, allons voir ça nous donnera peut-être des idées.
+        </div>
+    </div>
+
+
+    <div class="direction-box">
+        Dirigez vous vers la droite de l'église pour aller jusqu'au Monument aux morts.
+    </div>
+
+</div>
+
+<script>
+    // ----------------------------------------------------------------------
+    // --- GESTION ET PERSISTANCE DES DONNÉES (À INCLURE DANS CHAQUE PAGE) ---
+    // ----------------------------------------------------------------------
+
+    const ENIGMA_STORAGE_KEY = 'colomiers_enigma_answers';
+    // Maintien de la structure complète des variables pour la persistance
+    const DEFAULT_ANSWERS = {A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null, J: null, K: null, L: null, M: null, N: null};
+
+    /**
+     * Charge les réponses depuis le localStorage.
+     */
+    function loadEnigmaAnswers() {
+        try {
+            const savedData = localStorage.getItem(ENIGMA_STORAGE_KEY);
+            // S'assurer que si savedData est null ou vide, on retourne l'objet par défaut (toutes les clés à null)
+            if (!savedData) {
+                return DEFAULT_ANSWERS;
+            }
+            // Fusionner pour s'assurer que toutes les clés existent, même si elles sont nouvelles (par exemple 'C')
+            return {...DEFAULT_ANSWERS, ...JSON.parse(savedData)};
+        } catch (e) {
+            console.error("Impossible de charger les réponses. Réinitialisation des données.", e);
+            return DEFAULT_ANSWERS;
+        }
+    }
+
+    function saveEnigmaAnswers(vars) {
+        try {
+            localStorage.setItem(ENIGMA_STORAGE_KEY, JSON.stringify(vars));
+        } catch (e) {
+            console.error("Impossible de sauvegarder les réponses. Le stockage local est bloqué.", e);
+        }
+    }
+    
+    /**
+     * Réinitialise le style du bouton de validation lorsque le champ est modifié.
+     * @param {string} varKey - La lettre de la variable (ex: 'C').
+     */
+    function resetValidation(varKey) {
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const validationMessage = document.getElementById('validation-message');
+        
+        // 1. Réinitialiser le style du bouton
+        button.classList.remove('btn-validated');
+        button.classList.add('btn-default');
+        button.textContent = "Valider la réponse";
+
+        // 2. Supprimer les messages d'erreur au fur et à mesure de la saisie
+        validationMessage.textContent = "";
+
+        // 3. Vider la valeur sauvegardée si l'utilisateur vide l'input
+        const rawValue = inputElement.value.trim();
+        if (rawValue === "") {
+            let currentVars = loadEnigmaAnswers();
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+        }
+    }
+
+
+    /**
+     * Gère la validation de l'utilisateur au clic sur le bouton.
+     * @param {string} varKey - La lettre de la variable (ex: 'C').
+     */
+    function handleValidation(varKey) {
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const validationMessage = document.getElementById('validation-message');
+        
+        const rawValue = inputElement.value.trim();
+        const value = parseInt(rawValue);
+        let currentVars = loadEnigmaAnswers();
+        
+        validationMessage.textContent = "";
+
+        // CAS 1: Champ vide
+        if (rawValue === "") {
+            validationMessage.textContent = "❌ Veuillez entrer une valeur numérique.";
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+            resetButtonToDefault(button);
+            return;
+        }
+        
+        // CAS 2: Validation Générale (Entier naturel positif entre 0 et 99)
+        if (isNaN(value) || value < 0 || value > 99 || rawValue.includes('.')) {
+            validationMessage.textContent = "❌ Valeur incorrecte. Veuillez entrer un nombre entier positif entre 0 et 99.";
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+            resetButtonToDefault(button);
+            return;
+        }
+
+        // CAS 3: Succès - La valeur est valide
+        currentVars[varKey] = value;
+        saveEnigmaAnswers(currentVars);
+        
+        // Mise à jour du bouton pour indiquer la sauvegarde
+        button.classList.remove('btn-default');
+        button.classList.add('btn-validated');
+        button.textContent = `Réponse ${varKey} = ${value} Sauvegardée !`;
+    }
+
+    /**
+     * Réinitialise le bouton à son état par défaut (Gris).
+     */
+    function resetButtonToDefault(button) {
+        button.classList.remove('btn-validated');
+        button.classList.add('btn-default');
+        button.textContent = "Valider la réponse";
+    }
+    
+    /**
+     * Fonction d'initialisation : charge les données au chargement de la page et met à jour le bouton.
+     * @param {string} varKey - La lettre de la variable pour cette page (ex: 'C').
+     */
+    function initEnigmaPage(varKey) {
+        const loadedVars = loadEnigmaAnswers();
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const savedValue = loadedVars[varKey];
+        
+        // 1. Vider l'input dans tous les cas au chargement pour respecter la demande
+        if (inputElement) {
+            inputElement.value = "";
+        }
+        
+        // 2. Mettre à jour l'état du bouton si une valeur est trouvée dans la mémoire
+        if (button && savedValue !== null) {
+            button.classList.remove('btn-default');
+            button.classList.add('btn-validated');
+            button.textContent = `Réponse ${varKey} = ${savedValue} Sauvegardée !`;
+        } else if (button) {
+            // Si aucune valeur valide n'est sauvegardée, le bouton reste gris
+            resetButtonToDefault(button);
+        }
+        
+        // 3. Assurer que le bouton est réinitialisé si l'utilisateur commence à saisir
+        if(inputElement) {
+            inputElement.oninput = () => resetValidation(varKey);
+        }
+    };
+</script>
+
+</body>
+</html>

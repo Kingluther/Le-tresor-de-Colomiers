@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le trésor de Colomiers - Étape 15 : Le trésor</title>
+    <style>
+        /* --- DESIGN GÉNÉRAL --- */
+        body {
+            font-family: 'Verdana', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d35400;
+            font-size: 24px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #2980b9;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 5px solid #2980b9;
+            padding-left: 10px;
+        }
+
+        /* --- STYLE DES DIALOGUES (Omis) --- */
+        .dialogue-row { display: flex; align-items: flex-start; margin-bottom: 15px; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; flex-shrink: 0; margin-right: 15px; }
+        img[alt="Didier"] { border: 2px solid #2ecc71; }
+        .bubble { background-color: #e9eff5; padding: 12px 15px; border-radius: 0 15px 15px 15px; position: relative; font-size: 15px; line-height: 1.4; }
+        .bubble::before { content: ""; position: absolute; top: 0; left: -10px; width: 0; height: 0; border-top: 10px solid #e9eff5; border-left: 10px solid transparent; }
+        .name-tag { font-size: 11px; font-weight: bold; color: #666; margin-bottom: 4px; display: block; text-transform: uppercase; }
+
+        /* --- COORDONNÉES GPS (INITIAL) --- */
+        .gps-box { text-align: center; margin: 20px 0; padding: 15px; background-color: #fff3cd; border-radius: 8px; border: 1px solid #ffeeba; }
+        .gps-link { display: inline-block; margin-top: 5px; color: #856404; font-weight: bold; text-decoration: none; border-bottom: 2px dotted #856404; }
+        .gps-link:hover { background-color: #856404; color: white; }
+
+        /* --- ENCART "MISSION" (VERT SUCCÈS) --- */
+        .mission-box { border: 3px dashed #2ecc71; background-color: #f6fff6; padding: 20px; margin: 30px 0; text-align: left; font-size: 15px; border-radius: 10px; color: #333; }
+        .mission-box h3 { color: #2ecc71; margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 15px; }
+
+        /* Affichage des variables (Grille interactive) */
+        #variable-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .variable-item {
+            display: flex;
+            flex-direction: column; 
+            align-items: center; 
+            padding: 8px 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .variable-reminder {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: normal;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 100%; 
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 3px;
+            min-height: 15px; 
+        }
+        .variable-input-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .variable-item input {
+            width: 45px; 
+            padding: 4px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        
+        /* Légende et Pastilles de statut */
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .dot-green { background-color: #2ecc71; } /* Juste */
+        .dot-red { background-color: #e74c3c; } /* Faux / Contrainte violée */
+        .dot-orange { background-color: #f39c12; } /* Manquant */
+        
+        .legend p { margin: 5px 0; font-size: 14px; }
+
+        /* Style spécifique pour la formule */
+        .final-formula-display {
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            background-color: #fff;
+            border: 2px solid #2ecc71;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            overflow-x: auto;
+            color: #34495e; 
+            white-space: nowrap; 
+        }
+        
+        /* Zone de Vérification Finale */
+        .final-check-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .final-check-zone button {
+            margin-top: 15px;
+            padding: 12px 25px;
+            background-color: #d35400; 
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px #a04000;
+            transition: all 0.1s;
+        }
+        .final-check-zone button:active {
+            box-shadow: 0 1px #a04000;
+            transform: translateY(3px);
+        }
+
+        #result-message {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 20px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        #final-link-box {
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border: 1px solid #2ecc71;
+            border-radius: 8px;
+        }
+
+        /* --- ENCART "DIRECTION" (GRIS/NEUTRE) --- */
+        .direction-box {
+            background-color: #f8f9fa;
+            border-left: 6px solid #95a5a6;
+            padding: 15px 20px;
+            margin-top: 40px;
+            color: #555;
+            font-style: italic;
+            font-size: 15px;
+        }
+        
+    </style>
+</head>
+<body onload="initFinalPage()">
+
+<div class="container">
+
+    <h1>Le trésor de Colomiers</h1>
+
+    <h2>15. Le trésor</h2>
+
+    <div class="gps-box">
+        📍 Lieu de la révélation (à proximité du trésor) :<br>
+        <a href="https://www.google.com/maps/search/?api=1&query=43.613556,1.3371117" target="_blank" class="gps-link">
+            43.613672, 1.335429
+        </a>
+    </div>
+
+    <div class="dialogue-row"> <img src="Loumpour.jpg" alt="Loumpour" class="avatar"> <div class="bubble"> <span class="name-tag">Loumpour</span> DIDIER !! DIDIER !!! </div> </div>
+    <div class="dialogue-row"> <img src="didier.jpg" alt="Didier" class="avatar"> <div class="bubble"> <span class="name-tag">Didier</span> Eh, salut les copains ! Ca fait une heure que je vous cherche ! </div> </div>
+    <div class="dialogue-row"> <img src="Loumpour.jpg" alt="Loumpour" class="avatar"> <div class="bubble"> <span class="name-tag">Loumpour</span> Tu rigoles ou quoi ! On a eu le temps de faire trois fois le tour de la ville ! Mon c’est quoi cette histoire de tr… </div> </div>
+    <div class="dialogue-row"> <img src="didier.jpg" alt="Didier" class="avatar"> <div class="bubble"> <span class="name-tag">Didier</span> STOP ! Attention, tu vas marcher sur mon trésor ! </div> </div>
+    <div class="dialogue-row"> <img src="Loumpour.jpg" alt="Loumpour" class="avatar"> <div class="bubble"> <span class="name-tag">Loumpour</span> Où ?! Quoi ?! Y a rien par terre ! </div> </div>
+    <div class="dialogue-row"> <img src="didier.jpg" alt="Didier" class="avatar"> <div class="bubble"> <span class="name-tag">Didier</span> Si là regarde ! </div> </div>
+    <div class="dialogue-row"> <img src="Loumpour.jpg" alt="Loumpour" class="avatar"> <div class="bubble"> <span class="name-tag">Loumpour</span> Ca c’est pas un trésor, c’est du caca de pigeon ! </div> </div>
+    <div class="dialogue-row"> <img src="didier.jpg" alt="Didier" class="avatar"> <div class="bubble"> <span class="name-tag">Didier</span> Ben oui, justement ! La fiente est un engrais merveilleux ! Un véritable trésor ! C’est à ça qu'on mesurait au Moyen Âge la richesse d’une ville. La colombine est un des plus puissants engrais naturels - à utiliser avec modération bien-sûr. D’ailleurs le nom de Colomiers vient en fait d’une déformation de « Colombiers » qui était l’ancien nom qu’on donnait aux pigeonniers. Il y en a partout dans la ville encore aujourd’hui (des pigeonniers, la fiente c'est plus par ici qu'on en trouve) ! Et la colombe est toujours l’emblème de la ville. <br><br> D’ailleurs, c’était un signe de richesse économique mais aussi de pouvoir. La plupart des propriétaires de colombiers essayaient ainsi de devenir « co-seigneurs ». C’est comme ça qu’a commencé la prospérité de la ville, au pied du Fort qui se trouvait à quelques pas d’ici. </div> </div>
+    <div class="dialogue-row"> <img src="Loumpour.jpg" alt="Loumpour" class="avatar"> <div class="bubble"> <span class="name-tag">Loumpour (abattue)</span> Tu nous as fait faire tout ça pour de la m… </div> </div>
+    <div class="dialogue-row"> <img src="didier.jpg" alt="Didier" class="avatar"> <div class="bubble"> <span class="name-tag">Didier</span> De la fiente, oui ! Mais tu sais, ça donne bon goût aux fleurs quand on les butine ! </div> </div>
+    <div class="dialogue-row"> <img src="Loumpour.jpg" alt="Loumpour" class="avatar"> <div class="bubble"> <span class="name-tag">Loumpour</span> Bon allez, les blaireaux, ça suffit ! On rentre maintenant ! </div> </div>
+    <div class="dialogue-row"> <img src="Serge.jpg" alt="Serge" class="avatar"> <div class="bubble"> <span class="name-tag">Serge</span> On est pas des blaireaux ! On est des lamas ! </div> </div>
+    <div class="dialogue-row"> <img src="Bernard.jpg" alt="Bernard" class="avatar"> <div class="bubble"> <span class="name-tag">Bernard</span> Laisse-là, elle a pas l’âme à ça ! </div> </div>
+    <div class="dialogue-row"> <img src="Serge.jpg" alt="Serge" class="avatar"> <div class="bubble"> <span class="name-tag">Serge</span> Allez ! Salut Didier ! A une prochaine ! </div> </div>
+
+
+    <div class="mission-box">
+        <h3>L'ÉNIGME FINALE : VÉRIFICATION DES VARIABLES</h3>
+
+        <p>Utilisez la grille ci-dessous pour vérifier et corriger vos 14 variables. Le petit mot au-dessus de chaque champ vous rappelle l'indice associé. Vous devez obtenir le **statut VERT** pour chaque variable afin de débloquer le trésor.</p>
+        
+        <div id="variable-list">
+            </div>
+
+        <div class="legend">
+            <p><span class="status-dot dot-green"></span> **Vert :** La valeur est correcte **et** respecte toutes les contraintes de l'énigme.</p>
+            <p><span class="status-dot dot-red"></span> **Rouge :** La valeur est incorrecte **OU** ne respecte pas les contraintes (ex: D n'est pas impair, K est > 3, I n'est pas pair).</p>
+            <p><span class="status-dot dot-orange"></span> **Orange :** La valeur est **manquante** (À saisir).</p>
+        </div>
+        
+        <hr style="margin: 20px 0;">
+
+        <h4>Formule de Calcul des Coordonnées (Pour information) :</h4>
+        
+        <div class="final-formula-display">
+            N 4(E/A)°(L)(N).(B)(J-I)(G)′ E 1°(F+M).(D+H+K)(C)′
+        </div>
+        
+        <div class="final-check-zone">
+            
+            <button onclick="checkFinalAnswer()">Par ici le Trésor ! 🧭</button>
+            
+            <div id="result-message"></div>
+
+            <div id="final-link-box">
+                <p style="font-weight: bold; color: #2980b9;">
+                    Votre calcul est correct ! Le Trésor se trouve aux coordonnées : <br>
+                    N 43° 36.765′ E 1° 20.171′
+                </p>
+                <a id="final-gps-link" href="https://maps.google.com/?q=43.61275,1.3361833" target="_blank" style="display: inline-block; padding: 10px 15px; background-color: #2ecc71; color: white; border-radius: 5px; text-decoration: none; font-size: 16px;">
+                    Voir la cache sur la carte !
+                </a>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;">(Utilisez les coordonnées précises ci-dessus pour la recherche finale du contenant.)</p>
+            </div>
+        </div>
+    </div>
+    <div class="direction-box">
+        Finissez de descendre la rue du Prat pour retrouver la place Firmin Pons d’où vous avez commencé ce périple.
+    </div>
+
+</div>
+
+<script>
+    // ----------------------------------------------------------------------
+    // --- GESTION ET PERSISTANCE DES DONNÉES ---
+    // ----------------------------------------------------------------------
+
+    const ENIGMA_STORAGE_KEY = 'colomiers_enigma_answers';
+    const DEFAULT_ANSWERS = {A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null, J: null, K: null, L: null, M: null, N: null};
+    
+    // =================================================================================
+    // VALEURS CORRECTES
+    const CORRECT_ANSWERS = {
+        A: 2, B: 7, C: 1, D: 13, E: 6, F: 9, G: 5, H: 2, I: 2, J: 8, K: 2, L: 3, M: 11, N: 6
+    };
+    
+    // RAPPELS pour l'affichage au-dessus du champ
+    const REMINDERS = {
+        A: 'tours', B: 'losanges', C: 'centaines', D: '"Jean"', E: 'arches', 
+        F: 'lettres', G: 'juillet', H: 'dents', I: 'non potable', J: 'enfants', 
+        K: 'toboggan', L: 'gare', M: 'topiaires', N: 'prénoms'
+    };
+    
+    // CONTRAINTES SPÉCIFIQUES (fonction de validation STRICTE)
+    function validateConstraint(key, value) {
+        if (value === null) return false; // Si la valeur est null, elle ne peut pas être validée par contrainte.
+        
+        const numValue = parseInt(value);
+        if (isNaN(numValue)) return false;
+
+        switch (key) {
+            case 'K': // K doit être 1, 2 ou 3
+                return [1, 2, 3].includes(numValue);
+            case 'D': // D doit être impair
+                return numValue % 2 !== 0;
+            case 'I': // I doit être pair
+                return numValue % 2 === 0;
+            default:
+                return true; // Aucune contrainte spécifique pour les autres
+        }
+    }
+    // =================================================================================
+
+    function loadEnigmaAnswers() {
+        try {
+            const savedData = localStorage.getItem(ENIGMA_STORAGE_KEY);
+            return savedData ? {...DEFAULT_ANSWERS, ...JSON.parse(savedData)} : DEFAULT_ANSWERS;
+        } catch (e) {
+            console.error("Impossible de charger les réponses. Réinitialisation des données.", e);
+            return DEFAULT_ANSWERS;
+        }
+    }
+
+    function saveEnigmaAnswers(vars) {
+        try {
+            localStorage.setItem(ENIGMA_STORAGE_KEY, JSON.stringify(vars));
+        } catch (e) {
+            console.error("Impossible de sauvegarder les réponses.", e);
+        }
+    }
+
+    /**
+     * Gère la saisie directe dans la grille de variables, applique les contraintes et sauvegarde.
+     */
+    function handleVariableCorrection(varKey) {
+        const inputElement = document.getElementById(`input-${varKey}`);
+        let value = inputElement.value.trim();
+        let numericValue = parseInt(value);
+        let currentVars = loadEnigmaAnswers();
+        
+        if (value === "") {
+            currentVars[varKey] = null;
+        } else if (!isNaN(numericValue) && numericValue >= 0) {
+            currentVars[varKey] = numericValue;
+        } else {
+            inputElement.value = ''; 
+            currentVars[varKey] = null;
+        }
+
+        saveEnigmaAnswers(currentVars);
+        displayCollectedVariables(); // Rafraîchit l'affichage et la pastille
+    }
+    
+    /**
+     * Affiche toutes les variables collectées dans une grille interactive.
+     * @returns {number} 1 si toutes les variables sont correctes (valeur + contrainte), 0 sinon.
+     */
+    function displayCollectedVariables() {
+        const vars = loadEnigmaAnswers();
+        const listDiv = document.getElementById('variable-list');
+        listDiv.innerHTML = ''; 
+
+        const variableKeys = Object.keys(DEFAULT_ANSWERS);
+        let allCorrect = true;
+
+        variableKeys.forEach(key => {
+            const value = vars[key];
+            const correctValue = CORRECT_ANSWERS[key];
+            const reminder = REMINDERS[key];
+            const item = document.createElement('div');
+            item.className = 'variable-item';
+            
+            let dotClass = 'dot-orange'; 
+            let inputValue = '';
+            
+            if (value !== null && !isNaN(value)) {
+                inputValue = value;
+                
+                // 1. Vérification de la Contrainte Spécifique
+                const constraintValid = validateConstraint(key, value);
+                
+                // 2. Vérification de la Valeur Correcte
+                const valueCorrect = (value === correctValue);
+
+                // La variable est correcte UNIQUEMENT si la valeur est bonne ET que la contrainte est respectée
+                if (valueCorrect && constraintValid) {
+                    dotClass = 'dot-green'; 
+                } else {
+                    dotClass = 'dot-red'; 
+                    allCorrect = false;
+                }
+            } else {
+                allCorrect = false;
+            }
+
+            // Crée l'élément HTML pour la variable
+            item.innerHTML = `
+                <div class="variable-reminder">${reminder}</div>
+                <div class="variable-input-row">
+                    <span class="status-dot ${dotClass}"></span>
+                    ${key} = 
+                    <input 
+                        type="number" 
+                        id="input-${key}" 
+                        value="${inputValue}" 
+                        oninput="handleVariableCorrection('${key}')"
+                        placeholder="?"
+                    >
+                </div>
+            `;
+            listDiv.appendChild(item);
+        });
+
+        // Met à jour le style du bouton "Trésor"
+        const checkButton = document.querySelector('.final-check-zone button');
+        if (allCorrect) {
+            checkButton.style.backgroundColor = '#2ecc71';
+            checkButton.style.boxShadow = '0 4px #27ae60';
+        } else {
+            checkButton.style.backgroundColor = '#d35400';
+            checkButton.style.boxShadow = '0 4px #a04000';
+        }
+
+        return allCorrect ? 1 : 0;
+    }
+
+    /**
+     * Vérifie si toutes les variables sont correctes pour révéler la cache.
+     */
+    function checkFinalAnswer() {
+        const messageDiv = document.getElementById('result-message');
+        const finalLinkBox = document.getElementById('final-link-box');
+        const allVariablesCorrect = displayCollectedVariables(); 
+
+        finalLinkBox.style.display = 'none';
+
+        if (allVariablesCorrect) {
+            // Toutes les variables sont correctes
+            messageDiv.style.color = '#2ecc71';
+            messageDiv.textContent = "✅ FÉLICITATIONS ! Les 14 variables sont validées. Le Trésor est révélé ci-dessous.";
+            finalLinkBox.style.display = 'block';
+
+        } else {
+            // Au moins une variable est manquante ou incorrecte
+            messageDiv.style.color = '#e74c3c';
+            messageDiv.textContent = "❌ Attention ! Toutes les variables n'ont pas le statut VERT. Veuillez corriger la grille ci-dessus pour débloquer le Trésor.";
+        }
+    }
+
+    /**
+     * Fonction d'initialisation.
+     */
+    function initFinalPage() {
+        const allCorrect = displayCollectedVariables();
+        // Cacher le lien au chargement, sauf si toutes les variables sont déjà correctes
+        if (allCorrect) {
+            document.getElementById('final-link-box').style.display = 'block';
+            document.getElementById('result-message').style.color = '#2ecc71';
+            document.getElementById('result-message').textContent = "✅ Toutes les variables sont validées. Vous pouvez cliquer sur le bouton si vous le souhaitez.";
+        } else {
+            document.getElementById('final-link-box').style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

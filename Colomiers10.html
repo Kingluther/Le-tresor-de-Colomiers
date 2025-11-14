@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le trésor de Colomiers - Étape 10</title>
+    <style>
+        /* --- DESIGN GÉNÉRAL (IDENTIQUE) --- */
+        body {
+            font-family: 'Verdana', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d35400;
+            font-size: 24px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #2980b9;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 5px solid #2980b9;
+            padding-left: 10px;
+        }
+
+        /* --- STYLE DES DIALOGUES --- */
+        .dialogue-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .bubble {
+            background-color: #e9eff5;
+            padding: 12px 15px;
+            border-radius: 0 15px 15px 15px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .bubble::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid #e9eff5;
+            border-left: 10px solid transparent;
+        }
+
+        .name-tag {
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 4px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        /* Petite classe pour les descriptions narratives (actions, sons) */
+        .narrative-note {
+            text-align: center;
+            font-style: italic;
+            color: #888;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+
+        /* --- COORDONNÉES GPS --- */
+        .gps-box {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+        }
+        .gps-link {
+            display: inline-block;
+            margin-top: 5px;
+            color: #856404;
+            font-weight: bold;
+            text-decoration: none;
+            border-bottom: 2px dotted #856404;
+        }
+        .gps-link:hover {
+            background-color: #856404;
+            color: white;
+        }
+
+        /* --- ENCART "MISSION" (ORANGE) - ADAPTÉ POUR L'INPUT --- */
+        .mission-box {
+            border: 3px dashed #d35400;
+            background-color: #fffaf0; /* Blanc cassé pour l'encart mission */
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left; /* Aligné à gauche pour le texte long de la mission */
+            font-size: 15px;
+            border-radius: 10px;
+            color: #333;
+        }
+        
+        /* Zone de saisie du résultat */
+        .answer-input-zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .answer-input-zone label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #d35400; /* Mettre la variable en couleur mission */
+        }
+
+        .answer-input-zone input {
+            width: 50px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        /* Bouton de validation */
+        #validate-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        /* Styles du bouton */
+        .btn-default {
+            background-color: #bdc3c7; /* Gris neutre */
+            color: #34495e;
+        }
+
+        .btn-validated {
+            background-color: #e67e22; /* Orange: Validé/Sauvegardé */
+            color: white;
+        }
+
+        .btn-default:hover {
+            background-color: #ccd1d1;
+        }
+
+        /* Message de validation des contraintes */
+        #validation-message {
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #e74c3c;
+            min-height: 20px;
+            text-align: center;
+        }
+
+        /* --- ENCART "DIRECTION" (GRIS/NEUTRE) --- */
+        .direction-box {
+            background-color: #f8f9fa;
+            border-left: 6px solid #95a5a6;
+            padding: 15px 20px;
+            margin-top: 40px;
+            color: #555;
+            font-style: italic;
+            font-size: 15px;
+        }
+        
+        /* --- Styles spécifiques pour les avatars superposés avec chevauchement léger --- */
+        .stacked-avatars-visible {
+            position: relative;
+            width: 80px; /* Largeur pour que les deux soient visibles avec un léger chevauchement */
+            height: 50px; /* Hauteur de l'avatar */
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .stacked-avatars-visible .avatar-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2; /* Pour que Serge (à gauche) soit au-dessus si chevauchement */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
+
+        .stacked-avatars-visible .avatar-right {
+            position: absolute;
+            top: 0;
+            left: 30px; /* Chevauchement de 20px (50-30=20) */
+            z-index: 1;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
+    </style>
+</head>
+<body onload="initEnigmaPage('J')">
+
+<div class="container">
+
+    <h1>Le trésor de Colomiers</h1>
+
+    <h2>10. Le pavillon blanc</h2>
+
+    <div class="gps-box">
+        📍 Cliquez pour y aller :<br>
+        <a href="https://www.google.com/maps/search/?api=1&query=43.613556,1.3371110" target="_blank" class="gps-link">
+            43.609498, 1.334816
+        </a>
+    </div>
+
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            C’est quoi ce bâtiment étrange devant lequel on vient de passer ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Le pavillon blanc. D’après le site de la Mairie, il a été conçu par Rudy Riccioti en 2011. Il permet de réunir un espace médiathèque (plus de 110.000 ouvrages) et un espace dédié à l’art contemporain. Je me souviens que Colomiers a toujours été une ville motrice en termes d’art contemporain. Il y avait une galerie à quelques pas d’ici qui s’appelait « l’espace des arts » où étaient présentées des expositions temporaires. Elle est aujourd’hui occupée par une compagnie de théâtre qui fait aussi de la création contemporaine.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Et ça date pas d'hier. En 1982, Pierre Debeaux, connu pour être l’architecte de la caserne Vion à Toulouse, avait été choisi pour construire sur le rond-point de Flandres-Dunkerke une structure métallique gigantesque en trois dimensions. Un peu à la façon d’un mobile de Calder, elle bougeait au gré du vent. Elle s’est malheureusement écroulée 5 ans après son installation tuant deux personnes, qui étaient venues pour tenter de la réparer car elle ne bougeait plus.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Gloups… Euh, vous avez rien de plus joyeux ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Ah, ben si ! Colomiers est également labélisée “ville amie des enfants” par l’UNICEF depuis 2009 et renouvelé au moins jusqu’en 2026. Elle s’engage au bien-être, à la non-discrimination et à la participation des enfants dans la vie culturelle, politique et sportive.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Eh, mais voilà ! On l’a notre trésor : les enfants ! C’est vieux comme le monde, et ils sont tellement mignons…
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Ben si c’est ça ton trésor, moi j’en veux pas ! Beurk ! Ca bave, ça crie ! Non merci !
+        </div>
+    </div>
+
+
+    <div class="mission-box">
+        Sur la mosaïque à vos pieds, combien d’enfants sont représentés en tout ? (attention, la colombe ne compte pas, c’est juste l’emblème de la ville)
+        
+        <div class="answer-input-zone">
+            <label for="J">J =</label>
+            <input type="number" id="J" min="0" max="99" required oninput="resetValidation('J')">
+        </div>
+        
+        <div id="validation-message"></div>
+        
+        <button id="validate-button" class="btn-default" onclick="handleValidation('J')">
+            Valider la réponse
+        </button>
+    </div>
+
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Euh, puisqu’on parlait art contemporain, c’est pas le centre Pompidou là à gauche ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Beaubourg ? Non, c’est à Paris. Mais effectivement c’est quoi ce gros tube vert qui sort du toit ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Il y a écrit « espace nautique », ça doit être un toboggan aquatique…
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <div class="stacked-avatars-visible">
+            <img src="Serge.jpg" alt="Serge" class="avatar-left">
+            <img src="Bernard.jpg" alt="Bernard" class="avatar-right">
+        </div>
+        <div class="bubble">
+            <span class="name-tag">Serge et Bernard</span>
+            Un toboggan ! Géniaaaallll !! On y vaaaa….
+        </div>
+    </div>
+    
+    
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Mais attendez moi…
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            (à elle-même) Rhooo ils sont pénibles !
+        </div>
+    </div>
+
+
+    <div class="direction-box">
+        Prenez le premier chemin à gauche, traversez la mare aux canards, passez devant l’espace nautique et poursuivez jusqu’au fond de la place des fêtes pour mieux voir le toboggan.
+    </div>
+
+</div>
+
+<script>
+    // ----------------------------------------------------------------------
+    // --- GESTION ET PERSISTANCE DES DONNÉES (À INCLURE DANS CHAQUE PAGE) ---
+    // ----------------------------------------------------------------------
+
+    const ENIGMA_STORAGE_KEY = 'colomiers_enigma_answers';
+    // Maintien de la structure complète des variables pour la persistance
+    const DEFAULT_ANSWERS = {A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null, J: null, K: null, L: null, M: null, N: null};
+
+    /**
+     * Charge les réponses depuis le localStorage.
+     */
+    function loadEnigmaAnswers() {
+        try {
+            const savedData = localStorage.getItem(ENIGMA_STORAGE_KEY);
+            // S'assurer que si savedData est null ou vide, on retourne l'objet par défaut (toutes les clés à null)
+            if (!savedData) {
+                return DEFAULT_ANSWERS;
+            }
+            // Fusionner pour s'assurer que toutes les clés existent
+            return {...DEFAULT_ANSWERS, ...JSON.parse(savedData)};
+        } catch (e) {
+            console.error("Impossible de charger les réponses. Réinitialisation des données.", e);
+            return DEFAULT_ANSWERS;
+        }
+    }
+
+    function saveEnigmaAnswers(vars) {
+        try {
+            localStorage.setItem(ENIGMA_STORAGE_KEY, JSON.stringify(vars));
+        } catch (e) {
+            console.error("Impossible de sauvegarder les réponses. Le stockage local est bloqué.", e);
+        }
+    }
+    
+    /**
+     * Réinitialise le style du bouton de validation lorsque le champ est modifié.
+     * @param {string} varKey - La lettre de la variable (ex: 'J').
+     */
+    function resetValidation(varKey) {
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const validationMessage = document.getElementById('validation-message');
+        
+        // 1. Réinitialiser le style du bouton
+        button.classList.remove('btn-validated');
+        button.classList.add('btn-default');
+        button.textContent = "Valider la réponse";
+
+        // 2. Supprimer les messages d'erreur au fur et à mesure de la saisie
+        validationMessage.textContent = "";
+
+        // 3. Vider la valeur sauvegardée si l'utilisateur vide l'input
+        const rawValue = inputElement.value.trim();
+        if (rawValue === "") {
+            let currentVars = loadEnigmaAnswers();
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+        }
+    }
+
+
+    /**
+     * Gère la validation de l'utilisateur au clic sur le bouton.
+     * @param {string} varKey - La lettre de la variable (ex: 'J').
+     */
+    function handleValidation(varKey) {
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const validationMessage = document.getElementById('validation-message');
+        
+        const rawValue = inputElement.value.trim();
+        const value = parseInt(rawValue);
+        let currentVars = loadEnigmaAnswers();
+        
+        validationMessage.textContent = "";
+
+        // CAS 1: Champ vide
+        if (rawValue === "") {
+            validationMessage.textContent = "❌ Veuillez entrer une valeur numérique.";
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+            resetButtonToDefault(button);
+            return;
+        }
+        
+        // CAS 2: Validation Générale (Entier naturel positif entre 0 et 99)
+        if (isNaN(value) || value < 0 || value > 99 || rawValue.includes('.')) {
+            validationMessage.textContent = "❌ Valeur incorrecte. Veuillez entrer un nombre entier positif entre 0 et 99.";
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+            resetButtonToDefault(button);
+            return;
+        }
+
+        // CAS 3: Succès - La valeur est valide
+        currentVars[varKey] = value;
+        saveEnigmaAnswers(currentVars);
+        
+        // Mise à jour du bouton pour indiquer la sauvegarde
+        button.classList.remove('btn-default');
+        button.classList.add('btn-validated');
+        button.textContent = `Réponse ${varKey} = ${value} Sauvegardée !`;
+    }
+
+    /**
+     * Réinitialise le bouton à son état par défaut (Gris).
+     */
+    function resetButtonToDefault(button) {
+        button.classList.remove('btn-validated');
+        button.classList.add('btn-default');
+        button.textContent = "Valider la réponse";
+    }
+    
+    /**
+     * Fonction d'initialisation : charge les données au chargement de la page et met à jour le bouton.
+     * @param {string} varKey - La lettre de la variable pour cette page (ex: 'J').
+     */
+    function initEnigmaPage(varKey) {
+        const loadedVars = loadEnigmaAnswers();
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const savedValue = loadedVars[varKey];
+        
+        // 1. Vider l'input dans tous les cas au chargement 
+        if (inputElement) {
+            inputElement.value = "";
+        }
+        
+        // 2. Mettre à jour l'état du bouton si une valeur est trouvée dans la mémoire
+        if (button && savedValue !== null) {
+            button.classList.remove('btn-default');
+            button.classList.add('btn-validated');
+            button.textContent = `Réponse ${varKey} = ${savedValue} Sauvegardée !`;
+        } else if (button) {
+            // Si aucune valeur valide n'est sauvegardée, le bouton reste gris
+            resetButtonToDefault(button);
+        }
+        
+        // 3. Assurer que le bouton est réinitialisé si l'utilisateur commence à saisir
+        if(inputElement) {
+            inputElement.oninput = () => resetValidation(varKey);
+        }
+    };
+</script>
+
+</body>
+</html>

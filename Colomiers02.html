@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le trésor de Colomiers - Étape 2</title>
+    <style>
+        /* --- DESIGN GÉNÉRAL (IDENTIQUE CHAPITRE 1) --- */
+        body {
+            font-family: 'Verdana', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d35400;
+            font-size: 24px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #2980b9;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 5px solid #2980b9;
+            padding-left: 10px;
+        }
+
+        /* --- STYLE DES DIALOGUES --- */
+        .dialogue-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .bubble {
+            background-color: #e9eff5;
+            padding: 12px 15px;
+            border-radius: 0 15px 15px 15px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .bubble::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid #e9eff5;
+            border-left: 10px solid transparent;
+        }
+
+        .name-tag {
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 4px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        /* --- COORDONNÉES GPS --- */
+        .gps-box {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+        }
+        .gps-link {
+            display: inline-block;
+            margin-top: 5px;
+            color: #856404;
+            font-weight: bold;
+            text-decoration: none;
+            border-bottom: 2px dotted #856404;
+        }
+        .gps-link:hover {
+            background-color: #856404;
+            color: white;
+        }
+
+        /* --- ENCART "MISSION" (ORANGE) - ADAPTÉ POUR L'INPUT --- */
+        .mission-box {
+            border: 3px dashed #d35400;
+            background-color: #fffaf0; /* Blanc cassé pour l'encart mission */
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left; /* Aligné à gauche pour le texte long de la mission */
+            font-size: 15px;
+            border-radius: 10px;
+            color: #333;
+        }
+        
+        /* Zone de saisie du résultat */
+        .answer-input-zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .answer-input-zone label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .answer-input-zone input {
+            width: 50px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        /* Bouton de validation */
+        #validate-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        /* Styles du bouton */
+        .btn-default {
+            background-color: #bdc3c7; /* Gris neutre */
+            color: #34495e;
+        }
+
+        .btn-validated {
+            background-color: #e67e22; /* Orange: Validé/Sauvegardé */
+            color: white;
+        }
+
+        .btn-default:hover {
+            background-color: #ccd1d1;
+        }
+
+        /* Message de validation des contraintes */
+        #validation-message {
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #e74c3c;
+            min-height: 20px;
+            text-align: center;
+        }
+
+        /* --- ENCART "DIRECTION" (GRIS/NEUTRE) --- */
+        .direction-box {
+            background-color: #f8f9fa;
+            border-left: 6px solid #95a5a6;
+            padding: 15px 20px;
+            margin-top: 40px;
+            color: #555;
+            font-style: italic;
+            font-size: 15px;
+        }
+
+        /* --- IMAGE D'ILLUSTRATION (Spécifique à cette page) --- */
+        .illustration-grande {
+            max-width: 100%; /* S'adapte à la largeur du conteneur */
+            height: auto;    /* Maintient les proportions */
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: block;
+        }
+         /* Style pour le lien autour de l'image */
+        .image-link {
+            display: block; 
+            text-align: center; 
+            margin: 20px 0; 
+        }
+
+    </style>
+</head>
+<body onload="initEnigmaPage('B')">
+
+<div class="container">
+
+    <h1>Le trésor de Colomiers</h1>
+
+    <h2>2. Place Firmin Pons, terminus, tout le monde descend !</h2>
+
+    <div class="gps-box">
+        📍 Cliquez pour y aller :<br>
+        <a href="https://www.google.com/maps/search/?api=1&query=43.613556,1.337111" target="_blank" class="gps-link">
+            43°36'48.8"N 1°20'13.6"E
+        </a>
+    </div>
+
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Tiens regarde cette place Serge, elle te dit rien ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Ben non, une place ça parle pas !
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Idiot ! On a vu une photo dans notre vieux livre d’histoire de Colomiers. C’est de là que partait le tramway il y a plus de cent ans.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Ah, oui ! C’est vrai. Firmin Pons, surnommé « l’empereur Pons », il était considéré comme le créateur des transports en communs toulousains.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Sur la photo il y avait plein de boutiques sur cette place. C’était le premier centre ville de Colomiers qui reliait depuis la Révolution les trois rues principales de Colomiers : la rue du Prat, la rue du Couderc et la rue de l’église.
+        </div>
+    </div>
+
+    <a href="Pons.jpg" target="_blank" class="image-link">
+        <img src="Pons.jpg" alt="Place Firmin Pons ancienne" class="illustration-grande">
+    </a>
+
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Ben dis donc les frangins, vous avez bossé avant de venir.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Bossé ?? Tu nous as pris pour des dromadaires ??
+        </div>
+    </div>
+
+
+    <div class="mission-box">
+        Beaucoup de maisons d’époques ont disparu en un siècle, certaines effondrées, d’autres détruites. Pour autant il reste quelques vieilles toulousaines. Aux numéros 6 à 8 de la place se trouvent deux maisons avec des ouvertures en losanges juste au-dessous du toit. Combien de ces losanges comptez-vous en additionnant ceux des deux maisons ?
+        
+        <div class="answer-input-zone">
+            <label for="B">B =</label>
+            <input type="number" id="B" min="0" max="99" required oninput="resetValidation('B')">
+        </div>
+        
+        <div id="validation-message"></div>
+        
+        <button id="validate-button" class="btn-default" onclick="handleValidation('B')">
+            Valider la réponse
+        </button>
+    </div>
+
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Bon allez, faut pas qu’on traine plus longtemps, direction l’église.
+        </div>
+    </div>
+
+    <div class="direction-box">
+        Remontez la rue de l'église sur 100m en passant par la passerelle. Profitez-en pour jeter un oeil à votre gauche sur le rond-point "Flandres-Dunkerke" dont nous reparlerons ultérieurement.
+    </div>
+
+</div>
+
+<script>
+    // ----------------------------------------------------------------------
+    // --- GESTION ET PERSISTANCE DES DONNÉES (À INCLURE DANS CHAQUE PAGE) ---
+    // ----------------------------------------------------------------------
+
+    const ENIGMA_STORAGE_KEY = 'colomiers_enigma_answers';
+    const DEFAULT_ANSWERS = {A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null, J: null, K: null, L: null, M: null, N: null};
+
+    function loadEnigmaAnswers() {
+        try {
+            const savedData = localStorage.getItem(ENIGMA_STORAGE_KEY);
+            return savedData ? {...DEFAULT_ANSWERS, ...JSON.parse(savedData)} : DEFAULT_ANSWERS;
+        } catch (e) {
+            console.error("Impossible de charger les réponses.", e);
+            return DEFAULT_ANSWERS;
+        }
+    }
+
+    function saveEnigmaAnswers(vars) {
+        try {
+            localStorage.setItem(ENIGMA_STORAGE_KEY, JSON.stringify(vars));
+        } catch (e) {
+            console.error("Impossible de sauvegarder les réponses. Le stockage local est bloqué.", e);
+        }
+    }
+    
+    /**
+     * Réinitialise le style du bouton de validation lorsque le champ est modifié.
+     * @param {string} varKey - La lettre de la variable (ex: 'B').
+     */
+    function resetValidation(varKey) {
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const validationMessage = document.getElementById('validation-message');
+        
+        // 1. Réinitialiser le style du bouton
+        button.classList.remove('btn-validated');
+        button.classList.add('btn-default');
+        button.textContent = "Valider la réponse";
+
+        // 2. Supprimer les messages d'erreur au fur et à mesure de la saisie
+        validationMessage.textContent = "";
+
+        // 3. Vider la valeur sauvegardée si l'utilisateur vide l'input
+        const rawValue = inputElement.value.trim();
+        if (rawValue === "") {
+            let currentVars = loadEnigmaAnswers();
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+        }
+    }
+
+
+    /**
+     * Gère la validation de l'utilisateur au clic sur le bouton.
+     * @param {string} varKey - La lettre de la variable (ex: 'B').
+     */
+    function handleValidation(varKey) {
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const validationMessage = document.getElementById('validation-message');
+        
+        const rawValue = inputElement.value.trim();
+        const value = parseInt(rawValue);
+        let currentVars = loadEnigmaAnswers();
+        
+        validationMessage.textContent = "";
+
+        // CAS 1: Champ vide
+        if (rawValue === "") {
+            validationMessage.textContent = "❌ Veuillez entrer une valeur numérique.";
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+            resetButtonToDefault(button);
+            return;
+        }
+        
+        // CAS 2: Validation Générale (Entier naturel positif entre 0 et 99)
+        if (isNaN(value) || value < 0 || value > 99 || rawValue.includes('.')) {
+            validationMessage.textContent = "❌ Valeur incorrecte. Veuillez entrer un nombre entier positif entre 0 et 99.";
+            currentVars[varKey] = null;
+            saveEnigmaAnswers(currentVars);
+            resetButtonToDefault(button);
+            return;
+        }
+
+        // CAS 3: Validation Spécifique (Aucune contrainte spécifique pour B)
+        
+        
+        // CAS 4: Succès - La valeur est valide
+        currentVars[varKey] = value;
+        saveEnigmaAnswers(currentVars);
+        
+        // Mise à jour du bouton pour indiquer la sauvegarde
+        button.classList.remove('btn-default');
+        button.classList.add('btn-validated');
+        button.textContent = `Réponse ${varKey} = ${value} Sauvegardée !`;
+    }
+
+    /**
+     * Réinitialise le bouton à son état par défaut (Gris).
+     */
+    function resetButtonToDefault(button) {
+        button.classList.remove('btn-validated');
+        button.classList.add('btn-default');
+        button.textContent = "Valider la réponse";
+    }
+    
+    /**
+     * Fonction d'initialisation : charge les données au chargement de la page et met à jour le bouton.
+     * @param {string} varKey - La lettre de la variable pour cette page (ex: 'B').
+     */
+    function initEnigmaPage(varKey) {
+        const loadedVars = loadEnigmaAnswers();
+        const inputElement = document.getElementById(varKey);
+        const button = document.getElementById('validate-button');
+        const savedValue = loadedVars[varKey];
+        
+        // Vider l'input dans tous les cas au chargement
+        if (inputElement) {
+            inputElement.value = "";
+        }
+        
+        if (button && savedValue !== null) {
+            // Si une valeur est sauvegardée, mettre le bouton en état "Validé" (Orange)
+            button.classList.remove('btn-default');
+            button.classList.add('btn-validated');
+            button.textContent = `Réponse ${varKey} = ${savedValue} Sauvegardée !`;
+        } else if (button) {
+            // Si aucune valeur valide n'est sauvegardée, s'assurer que le bouton est gris
+            resetButtonToDefault(button);
+        }
+        
+        // S'assurer que le bouton est réinitialisé si l'utilisateur commence à saisir
+        if(inputElement) {
+            inputElement.oninput = () => resetValidation(varKey);
+        }
+    };
+</script>
+
+</body>
+</html>

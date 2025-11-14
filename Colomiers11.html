@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le trésor de Colomiers - Étape 11</title>
+    <style>
+        /* --- DESIGN GÉNÉRAL (IDENTIQUE) --- */
+        body {
+            font-family: 'Verdana', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d35400;
+            font-size: 24px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #2980b9;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 5px solid #2980b9;
+            padding-left: 10px;
+        }
+
+        /* --- STYLE DES DIALOGUES (IDENTIQUE) --- */
+        .dialogue-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .bubble {
+            background-color: #e9eff5;
+            padding: 12px 15px;
+            border-radius: 0 15px 15px 15px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .bubble::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid #e9eff5;
+            border-left: 10px solid transparent;
+        }
+
+        .name-tag {
+            font-size: 11px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 4px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        /* Petite classe pour les descriptions narratives (actions, sons) */
+        .narrative-note {
+            text-align: center;
+            font-style: italic;
+            color: #888;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+
+        /* --- COORDONNÉES GPS (IDENTIQUE) --- */
+        .gps-box {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+        }
+        .gps-link {
+            display: inline-block;
+            margin-top: 5px;
+            color: #856404;
+            font-weight: bold;
+            text-decoration: none;
+            border-bottom: 2px dotted #856404;
+        }
+        .gps-link:hover {
+            background-color: #856404;
+            color: white;
+        }
+
+        /* --- ENCART "MISSION" (ORANGE) --- */
+        .mission-box {
+            border: 3px dashed #d35400;
+            background-color: #fffaf0; /* Changement vers le jaune/orange plus clair */
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left; /* Aligné à gauche pour la mission */
+            font-size: 15px;
+            border-radius: 10px;
+            color: #333; /* Texte plus sombre pour la lisibilité */
+        }
+        
+        /* Styles pour les options à choix multiple dans la mission */
+        .mission-options {
+            margin-top: 15px;
+            font-weight: normal;
+        }
+        .mission-options label {
+            display: block;
+            margin: 5px 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .mission-options input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        /* Zone de saisie du résultat (K) */
+        .answer-input-zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .answer-input-zone label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #d35400; /* Mettre la variable en couleur mission */
+        }
+
+        .answer-input-zone input {
+            width: 50px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        /* Message de validation des contraintes */
+        #validation-message {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #e74c3c;
+            min-height: 20px;
+            text-align: center;
+        }
+
+        /* --- ENCART "DIRECTION" (GRIS/NEUTRE) --- */
+        .direction-box {
+            background-color: #f8f9fa;
+            border-left: 6px solid #95a5a6;
+            padding: 15px 20px;
+            margin-top: 40px;
+            color: #555;
+            font-style: italic;
+            font-size: 15px;
+        }
+        
+        /* --- Styles spécifiques pour les avatars superposés (identique) --- */
+        .stacked-avatars-visible {
+            position: relative;
+            width: 80px;
+            height: 50px;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .stacked-avatars-visible .avatar-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2; 
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
+
+        .stacked-avatars-visible .avatar-right {
+            position: absolute;
+            top: 0;
+            left: 30px;
+            z-index: 1;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
+
+    </style>
+</head>
+<body onload="initEnigmaPage('K')">
+
+<div class="container">
+
+    <h1>Le trésor de Colomiers</h1>
+
+    <h2>11. L’espace nautique</h2>
+
+    <div class="gps-box">
+        📍 Cliquez pour y aller :<br>
+        <a href="maps.google.com/6" target="_blank" class="gps-link">
+            43.608177, 1.332450
+        </a>
+    </div>
+
+
+    <div class="dialogue-row">
+        <div class="stacked-avatars-visible">
+            <img src="Serge.jpg" alt="Serge" class="avatar-left">
+            <img src="Bernard.jpg" alt="Bernard" class="avatar-right">
+        </div>
+        <div class="bubble">
+            <span class="name-tag">Serge et Bernard</span>
+            …
+        </div>
+    </div>
+    <div class="narrative-note">
+        (en pamoison devant le toboggan)
+    </div>
+
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Ah ben, ça au moins ça vous en bouche un coin (coin). Ca va peut-être vous étonner, mais côté sport, je pense que j’en connais plus que vous ! Colomiers est une super ville connue dans le monde entier pour ses performances sportives. L’USC Colomiers Rugby a remporté le challenge européen en 1998 et a même été vice champion d’Europe en 1999 et finaliste du championnat de France en 2000 !
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Ouais, mais ça vaut pas les performances du Stade Toulousain.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Peut-être mais pour une ville dix fois plus petite ça claque. Et en plus le Colomiers Rugby a aussi formé de grands joueurs internationaux : Jean-Luc Sadourny, les Skrela père et fils, et puis Fabien Galthié actuel sélectionneur de l’équipe de France !
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Ok, ok, mais t’as dis « le monde entier ». Les joueurs ne sont pas connus pour leur ville, mais pour le pays qu’ils représentent.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Peut-être, mais qu’est-ce que tu dis de ça ? En 2022, 9 adolescents issus de Breakin’School, l’école de breakdance de Colomiers ont été sacrés Champions du Monde de breakdance au Japon !
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Ouahou, la classe ! Mais en attendant, c’est plutôt embêtant…
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Je vois pas pourquoi.
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Ben parce que ça nous fait un trésor de plus ! Le sport aussi ça existe depuis toujours… Alors, c’est quoi qu’on cherche ? Un coffre plein d’or caché dans un sous-terrain ? Les reliques d’une sainte ? La douceur de vivre ? De l’art (contemporain ou pas) ? Des ronds points ? Des enfants ? Je sais plus moi !
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Bernard.jpg" alt="Bernard" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Bernard</span>
+            Serge ! Il en est où Didier ?
+        </div>
+    </div>
+
+    <div class="dialogue-row">
+        <img src="Serge.jpg" alt="Serge" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Serge</span>
+            Je sais pas, je vais lui demander…
+        </div>
+    </div>
+
+    
+    <div class="mission-box">
+        Avant de quitter le parking, comptez du mieux que vous pourrez le nombre de tronçons de toboggan que vous voyez (certains sont cachés par la végétation ou les murs, ce n’est pas grave).
+        <br>
+        **Combien en comptez-vous à peu près ?**
+        
+        <div class="mission-options" onchange="handleEnigmaInput('K')">
+            
+            <label><input type="radio" name="K_choice" id="option1" value="1"> 1) une dizaine</label>
+            
+            <label><input type="radio" name="K_choice" id="option2" value="2"> 2) **une vingtaine**</label>
+            
+            <label><input type="radio" name="K_choice" id="option3" value="3"> 3) une quarantaine</label>
+        </div>
+        
+        <br>
+        Notez le chiffre correspondant à la bonne réponse qui vaut **K** :
+        
+        <div class="answer-input-zone">
+            <label for="K">K =</label>
+            <input type="number" id="K" min="1" max="3" required readonly>
+        </div>
+        
+        <div id="validation-message"></div>
+        <br>
+        (indice supplémentaire : si vous multipliez ce chiffre par 5 vous saurez combien de mètres environ fait la longueur du toboggan !)
+    </div>
+
+
+    <div class="dialogue-row">
+        <img src="Loumpour.jpg" alt="Loumpour" class="avatar">
+        <div class="bubble">
+            <span class="name-tag">Loumpour</span>
+            Bon allez, de toute façon, on avait dit direction la mairie. C’est parti !
+        </div>
+        <div class="narrative-note">
+            
+        </div>
+    </div>
+
+
+    <div class="direction-box">
+        Repassez devant l’entrée de l’espace nautique, poursuivez en face de vous en laissant l’aire de jeux et le city stade à votre gauche puis tournez à gauche au niveau du kiosque pour arriver devant l’ancienne gare.
+    </div>
+
+</div>
+
+<script>
+    // ----------------------------------------------------------------------
+    // --- GESTION ET PERSISTANCE DES DONNÉES (À INCLURE DANS CHAQUE PAGE) ---
+    // ----------------------------------------------------------------------
+
+    // Clé de stockage (doit être la même sur toutes les pages)
+    const ENIGMA_STORAGE_KEY = 'colomiers_enigma_answers';
+    // Maintien de la structure complète des variables pour la persistance
+    const DEFAULT_ANSWERS = {A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null, J: null, K: null, L: null, M: null, N: null};
+
+    /**
+     * Charge les réponses depuis le stockage local du navigateur.
+     */
+    function loadEnigmaAnswers() {
+        try {
+            const savedData = localStorage.getItem(ENIGMA_STORAGE_KEY);
+            // Fusionner pour s'assurer que toutes les clés existent
+            return savedData ? {...DEFAULT_ANSWERS, ...JSON.parse(savedData)} : DEFAULT_ANSWERS;
+        } catch (e) {
+            console.error("Impossible de charger les réponses. Réinitialisation des données.", e);
+            return DEFAULT_ANSWERS;
+        }
+    }
+
+    /**
+     * Sauvegarde les réponses dans le stockage local du navigateur.
+     * @param {Object} vars - L'objet contenant toutes les variables d'énigme.
+     */
+    function saveEnigmaAnswers(vars) {
+        try {
+            localStorage.setItem(ENIGMA_STORAGE_KEY, JSON.stringify(vars));
+        } catch (e) {
+            console.error("Impossible de sauvegarder les réponses. Le stockage local est bloqué.", e);
+        }
+    }
+
+    /**
+     * Gère la saisie de l'utilisateur pour une variable spécifique (QCM pour K).
+     * @param {string} varKey - La lettre de la variable (ex: 'K').
+     */
+    function handleEnigmaInput(varKey) {
+        const inputElement = document.getElementById(varKey);
+        const validationMessage = document.getElementById('validation-message');
+        const selectedRadio = document.querySelector('input[name="K_choice"]:checked');
+        
+        let value = null;
+
+        if (selectedRadio) {
+            value = parseInt(selectedRadio.value);
+        } 
+        
+        let currentVars = loadEnigmaAnswers();
+        validationMessage.textContent = "";
+
+        // Si une valeur est sélectionnée (ce qui garantit que c'est 1, 2 ou 3)
+        if (value !== null) {
+            
+            // Sauvegarde de la valeur valide
+            currentVars[varKey] = value;
+            inputElement.value = value; // Afficher la valeur choisie dans le champ K
+            saveEnigmaAnswers(currentVars);
+            
+        } else {
+            // Si rien n'est sélectionné, on efface l'ancienne valeur
+            currentVars[varKey] = null;
+            inputElement.value = "";
+            saveEnigmaAnswers(currentVars);
+        }
+    }
+    
+    /**
+     * Fonction d'initialisation : charge les données au chargement de la page et pré-sélectionne le radio.
+     * @param {string} varKey - La lettre de la variable pour cette page (ex: 'K').
+     */
+    function initEnigmaPage(varKey) {
+        const loadedVars = loadEnigmaAnswers();
+        const inputElement = document.getElementById(varKey);
+        const savedValue = loadedVars[varKey];
+        
+        if (inputElement && savedValue !== null) {
+            const radioElement = document.querySelector(`input[name="K_choice"][value="${savedValue}"]`);
+            
+            // Pré-sélectionner le bouton radio et mettre à jour l'input text
+            if (radioElement) {
+                radioElement.checked = true;
+                inputElement.value = savedValue;
+            } else {
+                // Gérer le cas où la valeur sauvegardée est invalide
+                document.getElementById('validation-message').textContent = `❌ La valeur sauvegardée (${savedValue}) est invalide. Veuillez refaire votre choix.`;
+                loadedVars[varKey] = null;
+                saveEnigmaAnswers(loadedVars);
+            }
+        }
+    };
+</script>
+
+</body>
+</html>
